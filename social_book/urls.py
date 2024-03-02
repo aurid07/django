@@ -20,5 +20,4 @@ from django.urls import path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('signin', views.signin, namne='signin')
-    path('models', views.models, namne='models')
 ]
