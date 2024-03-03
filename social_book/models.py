@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 class Profile(models.Model):
@@ -10,4 +10,4 @@ class Profile(models.Model):
     location = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        retuen self.user.username
+        return self.user.username
