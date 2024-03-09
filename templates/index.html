@@ -196,6 +196,7 @@
                     <div class="space-y-5 flex-shrink-0 lg:w-7/12">
 
                         <!-- post 1-->
+                        {%  for post in posts reversed %}
                         <div class="bg-white shadow rounded-md  -mx-2 lg:mx-0">
     
                             <!-- post header-->
@@ -206,7 +207,7 @@
                                             <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" class="bg-gray-200 border border-white rounded-full w-8 h-8">
                                         </div>
                                     </a>
-                                    <span class="block capitalize font-semibold "> tomi_ml </span>
+                                    <span class="block capitalize font-semibold "> <a href="#">@{{post.user}}</a> </span>
                                 </div>
                               <div>
                                 <a href="#"> <i class="icon-feather-more-horizontal text-2xl hover:bg-gray-200 rounded-full p-2 transition -mr-1 "></i> </a>
@@ -323,6 +324,7 @@
                             </div>
     
                         </div>
+                        {%  endfor  %}
     
                         <!-- post 2-->                       
                     
@@ -380,8 +382,8 @@
                             <div uk-lightbox>
                                 <div class="grid grid-cols-2 gap-2 p-2">
 
-                                    <a href="{% static 'assets/images/post/img9.jpg' %}" class="col-span-2">  
-                                        <img src="{% static 'assets/images/post/img9.jpg' %}" alt="" class="rounded-md w-full lg:h-76 object-cover">
+                                    <a href="{{post.image.url}}" class="col-span-2">  
+                                        <img src="{{post.image.url}}" alt="" class="rounded-md w-full lg:h-76 object-cover">
                                     </a>
                                     <a href="{% static 'assets/images/post/img10.jpg' %}">  
                                         <img src="{% static 'assets/images/post/img10.jpg' %}" alt="" class="rounded-md w-full h-full">
@@ -428,6 +430,9 @@
                                         Liked <strong> taiye</strong> and <strong> 209 Others </strong>
                                     </div>
                                 </div>
+                                <p>
+                                   <a href="#"> <strong>{{post.user}}</strong></a>   {{post.caption}}
+                                </p>
 
                                 <div class="border-t pt-4 space-y-4 ">
                                     <div class="flex">
