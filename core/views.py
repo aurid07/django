@@ -9,6 +9,9 @@ from itertools import chain
 
 # Create your views here.
 
+def items_page(request):
+    return render(request,'items.html')
+
 @login_required(login_url='signin')
 def index(request):
     user_object = User.objects.get(username=request.user.username)
