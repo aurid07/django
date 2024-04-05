@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Note</title>
+    <!-- Add CSS static path -->
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <style>
+        /* Custom CSS styles for edit and delete buttons */
+        .note-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .edit-delete-buttons {
+            display: flex;
+        }
+        .edit-delete-buttons button {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Note</h1>
+    <form id="addNoteForm" action="{% url 'add_note' %}" method="POST">
+        {% csrf_token %}
+        <textarea id="noteInput" name="note" placeholder="Enter your note here"></textarea>
+        <button id="addNoteButton" type="submit">Add Note</button>
+    </form>
+    <a href="{% url 'index' %}">Back</a>
+
+    <!-- Display all notes -->
+    <h2>All Notes:</h2>
+    <ul id="allNotes">
+        {% for note in all_notes reversed %}
+            <li data-note-id="{{ note.id }}">
+                {{ note.content|linebreaksbr }} <!-- Use linebreaksbr filter to maintain line breaks -->
+                <div class="note-container">
+                    <div class="edit-delete-buttons">
+                        <form action="{% url 'edit_note' note_id=note.id %}" method="GET" style="display: inline;">
+                            <button type="submit">Edit</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <script>
+        // Function to dynamically add a new note to the list
+        function addNoteToList(noteContent, noteId) {
+            var formattedContent = noteContent.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
+            var listItem = document.createElement("li");
+            listItem.innerHTML = formattedContent;
+            listItem.setAttribute("data-note-id", noteId);
+            var noteContainer = document.createElement("div");
+            noteContainer.classList.add("note-container");
+            var editDeleteDiv = document.createElement("div");
+            editDeleteDiv.classList.add("edit-delete-buttons");
+            var editForm = document.createElement("form");
+            editForm.action = "{% url 'edit_note' note_id=0 %}".replace("0", noteId);
+            editForm.method = "GET";
+            var editButton = document.createElement("button");
+            editButton.type = "submit";
+            editButton.textContent = "Edit";
+            editForm.appendChild(editButton);
+            editDeleteDiv.appendChild(editForm);
+            noteContainer.appendChild(editDeleteDiv);
+            listItem.appendChild(noteContainer);
+            document.getElementById("allNotes").prepend(listItem);
+        }
+    
+        // Event listener for form submission
+        document.getElementById("addNoteForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var noteInput = document.getElementById("noteInput").value.trim(); // Trim whitespace
+    
+            if (noteInput.length === 0) { // Check if note is empty
+                alert("Note field cannot be empty."); // Show alert message
+                return; // Exit function
+            }
+    
+            var formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                addNoteToList(noteInput, data.note_id);
+                document.getElementById("noteInput").value = '';
+                window.location.reload(); // Reload the page after adding the note
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>    
+</body>
+</html>

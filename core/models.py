@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
-from datetime import datetime 
+from datetime import datetime
 
 User = get_user_model()
 
@@ -39,3 +39,10 @@ class FollowersCount(models.Model):
 
     def __str__(self):
         return self.user
+
+class Note(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+
+    def __str__(self):
+        return f'Note for {self.user.username}'

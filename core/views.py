@@ -3,10 +3,10 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Post, LikePost , FollowersCount
+from .models import Profile, Post, LikePost , FollowersCount, Note
 from itertools import chain
 import random
-
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -181,8 +181,6 @@ def signup(request):
                 new_profile = Profile.objects.create(user=user_model, id_user= user_model.id)
                 new_profile.save()
                 return redirect('settings')
-                
-
         else:
             messages.info(request, 'Password Not Matching' )
             return redirect('signup')
@@ -231,6 +229,34 @@ def like_post (request):
         post.save()
         return redirect('/')
 
+def add_note(request):
+    if request.method == 'POST':
+        note_content = request.POST.get('note')
+        Note.objects.create(user=request.user, content=note_content)
+        return JsonResponse({'success': True})
+    else:
+        all_notes = Note.objects.filter(user=request.user)
+        return render(request, 'add_note.html', {'all_notes': all_notes})
+
+@login_required(login_url='signin')
+def edit_note(request, note_id):
+    note = Note.objects.get(pk=note_id)
+    if request.method == 'POST':
+        note_content = request.POST.get('note')
+        note.content = note_content
+        note.save()
+        return redirect('add_note')
+    else:
+        return render(request, 'edit_note.html', {'note': note})
+
+@login_required(login_url='signin')
+def delete_note(request, note_id):
+    try:
+        note = Note.objects.get(pk=note_id)
+        note.delete()
+        return JsonResponse({'success': True})
+    except Note.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Note does not exist'})
 
 @login_required(login_url='signin')
 def profile(request, pk):
@@ -247,8 +273,6 @@ def profile(request, pk):
         
     user_followers= len(FollowersCount.objects.filter(user=pk))
     user_following= len(FollowersCount.objects.filter(follower=pk))
-
-
 
     context = {
         'user_object': user_object,
