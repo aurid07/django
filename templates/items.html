@@ -4,10 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Items Page</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .item {
+            margin-bottom: 10px;
+        }
+
+        .plus-btn, .minus-btn {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .count {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Items Page</h1>
-    <!-- Placeholder content -->
-    <p>This is the items page. You can display your items for sale here.</p>
+    <div class="container">
+        <h2>Items</h2>
+        <div class="item">
+            <span>Orange</span>
+            <button class="plus-btn">+</button>
+            <span class="count">0</span>
+            <button class="minus-btn">-</button>
+        </div>
+        <div class="item">
+            <span>Banana</span>
+            <button class="plus-btn">+</button>
+            <span class="count">0</span>
+            <button class="minus-btn">-</button>
+        </div>
+        <div class="item">
+            <span>Apple</span>
+            <button class="plus-btn">+</button>
+            <span class="count">0</span>
+            <button class="minus-btn">-</button>
+        </div>
+        <button class="submit-btn">Submit Request</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const plusButtons = document.querySelectorAll('.plus-btn');
+            const minusButtons = document.querySelectorAll('.minus-btn');
+            const submitButton = document.querySelector('.submit-btn');
+
+            plusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = button.parentElement;
+                    const countElement = item.querySelector('.count');
+                    let count = parseInt(countElement.textContent);
+                    count++;
+                    countElement.textContent = count;
+                });
+            });
+
+            minusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = button.parentElement;
+                    const countElement = item.querySelector('.count');
+                    let count = parseInt(countElement.textContent);
+                    if (count > 0) {
+                        count--;
+                        countElement.textContent = count;
+                    }
+                });
+            });
+
+            submitButton.addEventListener('click', function() {
+                const counts = document.querySelectorAll('.count');
+                counts.forEach(count => {
+                    count.textContent = '0';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
+
+
