@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Step Count</title>
+    <!-- Add CSS static path -->
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <style>
+        /* Add CSS to make the save and delete buttons bold */
+        button[type="submit"],
+        #deleteStepCountButton {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Step Count</h1>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <!-- Add fields for step count and status -->
+        <label for="step_count">Step Count:</label>
+        <input type="number" name="step_count" value="{{ form.step_count.value }}">
+        <label for="current_status">Status:</label>
+        <select name="current_status">
+            <option value="Completed" {% if step_count.current_status == "Completed" %}selected{% endif %}>Completed</option>
+            <option value="Running" {% if step_count.current_status == "Running" %}selected{% endif %}>Running</option>
+            <option value="Failed" {% if step_count.current_status == "Failed" %}selected{% endif %}>Failed</option>
+        </select>
+        <button type="submit">Save</button>
+        <!-- Add the delete button -->
+        <button type="button" id="deleteStepCountButton">Delete</button>
+        <!-- Change the URL for the Cancel link -->
+        <a href="{% url 'step_count' %}">Cancel</a>
+    </form>
+
+    <script>
+        // Add event listener to the delete button
+        document.getElementById("deleteStepCountButton").addEventListener("click", function() {
+            // Confirm deletion
+            var confirmation = confirm("Are you sure you want to delete this step count?");
+            if (confirmation) {
+                // Perform deletion
+                deleteStepCount();
+            }
+        });
+
+        // Function to perform deletion
+        function deleteStepCount() {
+            // Make an AJAX request to delete the step count
+            fetch("{% url 'delete_step_count' step_count.id %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Step count deleted successfully, redirect to index page
+                    window.location.href = "{% url 'step_count' %}";
+                } else {
+                    // Handle deletion failure
+                    console.error("Failed to delete step count");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>

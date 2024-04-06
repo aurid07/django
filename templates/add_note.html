@@ -50,40 +50,35 @@
             </li>
         {% endfor %}
     </ul>
+
     <script>
         // Function to dynamically add a new note to the list
-        function addNoteToList(noteContent, noteId) {
-            var formattedContent = noteContent.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
-            var listItem = document.createElement("li");
-            listItem.innerHTML = formattedContent;
-            listItem.setAttribute("data-note-id", noteId);
-            var noteContainer = document.createElement("div");
-            noteContainer.classList.add("note-container");
-            var editDeleteDiv = document.createElement("div");
-            editDeleteDiv.classList.add("edit-delete-buttons");
-            var editForm = document.createElement("form");
-            editForm.action = "{% url 'edit_note' note_id=0 %}".replace("0", noteId);
-            editForm.method = "GET";
-            var editButton = document.createElement("button");
-            editButton.type = "submit";
-            editButton.textContent = "Edit";
-            editForm.appendChild(editButton);
-            editDeleteDiv.appendChild(editForm);
-            noteContainer.appendChild(editDeleteDiv);
-            listItem.appendChild(noteContainer);
-            document.getElementById("allNotes").prepend(listItem);
-        }
-    
+function addNoteToList(noteContent, noteId) {
+    var formattedContent = noteContent.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
+    var listItem = document.createElement("li");
+    listItem.innerHTML = formattedContent;
+    listItem.setAttribute("data-note-id", noteId);
+    var noteContainer = document.createElement("div");
+    noteContainer.classList.add("note-container");
+    var editDeleteDiv = document.createElement("div");
+    editDeleteDiv.classList.add("edit-delete-buttons");
+    var editForm = document.createElement("form");
+    editForm.action = "{% url 'edit_note' note_id=0 %}".replace("0", noteId);
+    editForm.method = "GET";
+    var editButton = document.createElement("button");
+    editButton.type = "submit";
+    editButton.textContent = "Edit";
+    editForm.appendChild(editButton);
+    editDeleteDiv.appendChild(editForm);
+    noteContainer.appendChild(editDeleteDiv);
+    listItem.appendChild(noteContainer);
+    document.getElementById("allNotes").prepend(listItem);
+}
         // Event listener for form submission
         document.getElementById("addNoteForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            var noteInput = document.getElementById("noteInput").value.trim(); // Trim whitespace
-    
-            if (noteInput.length === 0) { // Check if note is empty
-                alert("Note field cannot be empty."); // Show alert message
-                return; // Exit function
-            }
-    
+            var noteInput = document.getElementById("noteInput").value;
+
             var formData = new FormData(this);
             fetch(this.action, {
                 method: 'POST',
@@ -100,6 +95,6 @@
             })
             .catch(error => console.error('Error:', error));
         });
-    </script>    
+    </script>
 </body>
 </html>

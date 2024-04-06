@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step Count Leaderboard</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <style>
+        /* Add custom CSS styles here */
+        .back-button {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header_inner">
+            <div class="right-side lg:pr-4">
+                <!-- Back Button -->
+                <a href="{% url 'step_count' %}" class="back-button bg-green-500 flex font-bold hover:bg-green-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shadow text-white">
+                    <ion-icon name="arrow-back-outline" class="-mb-1 mr-1 opacity-90 text-xl uilus-arrow-back"></ion-icon> Back
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Top 10 Completed Step Count Leaderboard</h1>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th>Ranking</th>
+                    <th>User</th>
+                    <th>Step Counts</th>
+                    <th>Current Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for step_count in completed_step_counts|slice:":10" %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ step_count.created_by }}</td>
+                    <td>{{ step_count.step_count }}</td>
+                    <td>{{ step_count.current_status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

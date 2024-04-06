@@ -3,10 +3,11 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Post, LikePost , FollowersCount, Note
+from .models import Profile, Post, LikePost , FollowersCount, Note, StepCount
 from itertools import chain
 import random
 from django.http import JsonResponse
+from .forms import StepCountForm
 
 # Create your views here.
 
@@ -229,6 +230,52 @@ def like_post (request):
         post.save()
         return redirect('/')
 
+@login_required(login_url='signin')
+def step_count(request):
+    if request.method == 'POST':
+        form = StepCountForm(request.POST)
+        if form.is_valid():
+            # Assign the logged-in user as the creator of the StepCount instance
+            step_count = form.save(commit=False)
+            step_count.created_by = request.user
+            step_count.save()
+            data = {
+                'success': True,
+                'step_count': step_count.step_count,
+                'current_status': step_count.current_status,
+                'step_count_id': step_count.id,  # Add step_count_id here
+            }
+            return JsonResponse(data)
+    else:
+        form = StepCountForm()
+    # Retrieve step counts associated with the current user
+    user_step_counts = StepCount.objects.filter(created_by=request.user)
+    return render(request, 'step_count.html', {'form': form, 'user_step_counts': user_step_counts, 'stepCountId': user_step_counts.first().id if user_step_counts.exists() else None})
+
+@login_required(login_url='signin')
+def edit_step_count(request, step_count_id):
+    step_count = StepCount.objects.get(pk=step_count_id)
+    if request.method == 'POST':
+        form = StepCountForm(request.POST, instance=step_count)
+        if form.is_valid():
+            form.save()
+            return redirect('step_count')
+    else:
+        form = StepCountForm(instance=step_count)
+    return render(request, 'edit_step_count.html', {'form': form, 'step_count': step_count})
+
+@login_required(login_url='signin')
+def delete_step_count(request, step_count_id):
+    step_count = StepCount.objects.get(pk=step_count_id)
+    step_count.delete()
+    return redirect('step_count')
+
+@login_required(login_url='signin')
+def step_count_leaderboard(request):
+    completed_step_counts = StepCount.objects.filter(current_status='Completed').order_by('-step_count')
+    return render(request, 'step_count_leaderboard.html', {'completed_step_counts': completed_step_counts})
+
+@login_required(login_url='signin')
 def add_note(request):
     if request.method == 'POST':
         note_content = request.POST.get('note')

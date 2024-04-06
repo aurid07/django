@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step Counts</title>
+    <!-- Add CSS static path -->
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <style>
+        /* CSS styles for the leaderboard link/button */
+        .leaderboard-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none; /* Remove underline */
+        }
+        
+        /* CSS styles for the edit button */
+        .edit-button {
+            font-weight: bold;
+            cursor: pointer; /* Add cursor style */
+        }
+    </style>
+</head>
+<body>
+    <h1>Step Counts</h1>
+    
+    <!-- Form to add a new step count -->
+    <form id="addStepCountForm" method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button id="addStepCountButton" type="submit">Add Step Count</button>
+    </form>
+    
+    <!-- Link to go back to index page -->
+    <a href="{% url 'index' %}">Back</a>
+    
+    <!-- Table to display user's step counts -->
+    <h2>Your Step Counts:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Step Count</th>
+                <th>Current Status</th>
+                <th>Action</th> <!-- Add a new header for the action column -->
+            </tr>
+        </thead>
+        <tbody id="stepCountTableBody">
+            {% for step_count in user_step_counts reversed %}
+            <tr>
+                <td>{{ step_count.step_count }}</td>
+                <td>{{ step_count.current_status }}</td>
+                <td> <!-- Add a new cell for the action button -->
+                    <form action="{% url 'edit_step_count' step_count_id=step_count.id %}" method="GET" style="display: inline;">
+                        <button type="submit" class="edit-button">Edit</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Button to navigate to Step Count Leaderboard -->
+    <a href="{% url 'step_count_leaderboard' %}" class="leaderboard-button bg-green-500 flex hover:bg-green-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shadow text-white">
+        Step Count Leaderboard
+    </a>
+    
+    <script>
+        // Function to handle form submission asynchronously
+        document.getElementById("addStepCountForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+            var formData = new FormData(this); // Create FormData object from the form
+            fetch(this.action, { // Send a POST request using fetch API
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token in the request header
+                }
+            })
+            .then(response => response.json()) // Parse response as JSON
+            .then(data => {
+                if (data.success) { // Check if the submission was successful
+                    // Create a new row to the table with the submitted step count
+                    var newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                        <td>${data.step_count}</td>
+                        <td>${data.current_status}</td>
+                    `;
+                    // Insert the new row at the beginning of the table
+                    var tbody = document.getElementById("stepCountTableBody");
+                    tbody.insertBefore(newRow, tbody.firstChild);
+                    // Reset the form
+                    document.getElementById("addStepCountForm").reset();
+                    // Reload the page after adding the step count
+                    window.location.reload();
+                } else {
+                    // Handle errors if any
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>    
+</body>
+</html>

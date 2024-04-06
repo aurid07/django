@@ -46,3 +46,8 @@ class Note(models.Model):
 
     def __str__(self):
         return f'Note for {self.user.username}'
+
+class StepCount(models.Model):
+    created_by = models.CharField(max_length=100)
+    step_count = models.IntegerField()
+    current_status = models.CharField(max_length=100)
